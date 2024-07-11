@@ -2,6 +2,7 @@ package dev.wand.auth;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.wand.Main;
 import dev.wand.endpoint.DestinyEndpoint;
 import dev.wand.request.AuthedDestinyRequest;
 import dev.wand.response.DestinyResponse;
@@ -52,8 +53,9 @@ public class AuthHandler {
                 return "No state provided. Contact developer of Discord bot.";
             }
 
+            String authCode = "47655:" + Main.DESTINY_CLIENT_SECRET;
             String auth = Base64.getEncoder().encodeToString(
-                    "47655:oj6Y4OfdnOdRQnWteGK4YmL2V0T3Oc3vCdObc4Xh8GE".getBytes(StandardCharsets.UTF_8)
+                    authCode.getBytes(StandardCharsets.UTF_8)
             );
 
             HttpURLConnection connection = null;

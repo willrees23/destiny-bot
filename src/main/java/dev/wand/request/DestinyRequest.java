@@ -76,7 +76,7 @@ public abstract class DestinyRequest {
     }
 
     public HttpURLConnection buildRequest() throws IOException {
-        URL url = new URL(endpoint + "?" + getParamsString());
+        URL url = new URL(endpoint + getParamsString());
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod(method);
 
@@ -101,10 +101,15 @@ public abstract class DestinyRequest {
         StringBuilder result = new StringBuilder();
 
         for (Map.Entry<String, String> entry : params.entrySet()) {
+            // check if first param
+            if (result.isEmpty()) {
+                result.append("?");
+            } else {
+                result.append("&");
+            }
             result.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
             result.append("=");
             result.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
-            result.append("&");
         }
 
         String resultString = result.toString();

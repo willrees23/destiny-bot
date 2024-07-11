@@ -14,7 +14,7 @@ import xyz.dynxsty.dih4jda.interactions.commands.application.RegistrationType;
 
 public class Main {
 
-    public static String DESTINY_API_KEY;
+    public static String DESTINY_API_KEY, DESTINY_CLIENT_SECRET;
 
     public static void main(String[] args)
             throws InterruptedException {
@@ -22,7 +22,8 @@ public class Main {
         Dotenv env = Dotenv.load();
 
         String BOT_TOKEN = env.get("BOT_TOKEN");
-        DESTINY_API_KEY = env.get("DESTINY_API_KEY");
+        Main.DESTINY_API_KEY = env.get("DESTINY_API_KEY");
+        Main.DESTINY_CLIENT_SECRET = env.get("DESTINY_CLIENT_SECRET");
 
         JDA jda = JDABuilder.createDefault(BOT_TOKEN)
                 .addEventListeners(new ReadyListener(), new ShutdownListener())
