@@ -4,8 +4,6 @@ import dev.wand.auth.AuthData;
 import dev.wand.request.AuthedDestinyRequest;
 import dev.wand.request.DestinyRequest;
 import dev.wand.request.GenericDestinyRequest;
-import dev.wand.response.wrapper.WrapperGetCurrentBungieNetUser;
-import lombok.Getter;
 
 import java.io.IOException;
 import java.util.Map;
@@ -17,6 +15,17 @@ public interface DestinyEndpoint {
 
         try {
             return new AuthedDestinyRequest(url.toString(), method, data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    static DestinyRequest customPOST(String endpoint, AuthData data) {
+        StringBuilder url = new StringBuilder("https://www.bungie.net/Platform" + endpoint);
+
+        try {
+            return new AuthedDestinyRequest(url.toString(), "POST", data);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -98,7 +107,7 @@ public interface DestinyEndpoint {
     }
 
     enum Generic implements DestinyEndpoint {
-        ;
+        DESTINY2_SEARCH_MANIFEST("/Destiny2/Manifest/{entityType}/{hashIdentifier}/");
 
         private final String endpoint;
 
@@ -109,6 +118,35 @@ public interface DestinyEndpoint {
         @Override
         public String getEndpoint() {
             return endpoint;
+        }
+
+        public GenericDestinyRequest hitWithPath(String method, Map<String, String> pathParams) throws IOException {
+
+            StringBuilder url = new StringBuilder(getURL());
+            for (Map.Entry<String, String> entry : pathParams.entrySet()) {
+                url = new StringBuilder(url.toString().replace("{" + entry.getKey() + "}", entry.getValue()));
+            }
+
+            return new GenericDestinyRequest(url.toString(), method);
+        }
+
+        public GenericDestinyRequest hitWithQuery(String method, Map<String, String> queryParams) throws IOException {
+
+            StringBuilder url = new StringBuilder(getURL());
+
+            for (Map.Entry<String, String> entry : queryParams.entrySet()) {
+                url.append("?").append(entry.getKey()).append("=").append(entry.getValue());
+            }
+
+            return new GenericDestinyRequest(url.toString(), method);
+        }
+
+        public GenericDestinyRequest hit(String method, Map<String, String> pathParams, Map<String, String> queryParams) throws IOException {
+
+            StringBuilder url = new StringBuilder(getURL());
+            url = getStringBuilder(pathParams, queryParams, url);
+
+            return new GenericDestinyRequest(url.toString(), method);
         }
 
         public GenericDestinyRequest hit(String method) throws IOException {

@@ -27,6 +27,8 @@ public class AuthedDestinyRequest extends GenericDestinyRequest {
         build();
     }
 
+
+
     public AuthedDestinyRequest(String endpoint, String method, User user) throws IOException {
         super(endpoint, method);
         this.authToken = AuthHandler.getAuthData(user.getId()).getAccessToken();

@@ -4,10 +4,13 @@ import net.dec4234.javadestinyapi.material.DestinyAPI;
 import net.dec4234.javadestinyapi.material.user.BungieUser;
 import net.dec4234.javadestinyapi.material.user.DestinyCharacter;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.AutoCompleteQuery;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import xyz.dynxsty.dih4jda.interactions.AutoCompletable;
 import xyz.dynxsty.dih4jda.interactions.commands.application.SlashCommand;
 
 import java.util.Comparator;
@@ -18,10 +21,9 @@ public class UserCommand extends SlashCommand {
     public UserCommand() {
         setCommandData(
                 Commands.slash("user", "Get information about a user")
-                        .addOption(OptionType.STRING, "username", "The username of the user", true)
-                        .addOption(OptionType.INTEGER, "discriminator", "The discriminator of the user (ex. #1234)", false)
+                        .addOption(OptionType.STRING, "username", "The username of the user", true, true)
+                        .addOption(OptionType.INTEGER, "discriminator", "The discriminator of the user (ex. #1234)", false, true)
         );
-
     }
 
     @Override

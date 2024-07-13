@@ -5,29 +5,25 @@ import dev.wand.auth.AuthHandler;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.jetbrains.annotations.Nullable;
+import xyz.dynxsty.dih4jda.interactions.AutoCompletable;
 import xyz.dynxsty.dih4jda.interactions.commands.application.SlashCommand;
 
 public abstract class AuthedSlashCommand extends SlashCommand {
 
     public AuthedSlashCommand(String name, String description) {
-        setCommandData(
-                Commands.slash(
-                        name,
-                        description
-                )
-        );
+        setCommandData(Commands.slash(name, description));
     }
 
-    public AuthedSlashCommand(String name, String description, OptionData... data) {
-        setCommandData(
-                Commands.slash(
-                        name,
-                        description
-                )
-        );
+    public AuthedSlashCommand() {
+        super();
     }
 
-    public abstract void execute(SlashCommandInteractionEvent event, AuthData authData);
+    protected void addOptions(OptionData... optionData) {
+        getCommandData().addOptions(optionData);
+    }
+
+    public abstract void executeAuth(SlashCommandInteractionEvent event, AuthData authData);
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -41,6 +37,6 @@ public abstract class AuthedSlashCommand extends SlashCommand {
             event.reply("Your access token has expired. Use </authorize:1260240797945561250> to reauthorize.").setEphemeral(true).queue();
             return;
         }
-        execute(event, authData);
+        executeAuth(event, authData);
     }
 }

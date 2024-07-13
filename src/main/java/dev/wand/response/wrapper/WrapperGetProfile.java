@@ -1,9 +1,17 @@
 package dev.wand.response.wrapper;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dev.wand.endpoint.DestinyEndpoint;
+import dev.wand.request.GenericDestinyRequest;
 import lombok.Getter;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 public class WrapperGetProfile {
@@ -13,11 +21,14 @@ public class WrapperGetProfile {
     @JsonProperty("secondaryComponentsMintedTimestamp")
     private String secondaryComponentsMintedTimestamp;
 
+    @JsonProperty("characterInventories")
+    public CharacterInventories characterInventories;
+
     @JsonProperty("profile")
     Profile profile;
 
     @Getter
-    public class Profile {
+    public static class Profile {
         @JsonProperty("data")
         Data data;
 
@@ -26,7 +37,7 @@ public class WrapperGetProfile {
     }
 
     @Getter
-    public class Data {
+    public static class Data {
         @JsonProperty("userInfo")
         UserInfo userInfo;
 
@@ -62,7 +73,7 @@ public class WrapperGetProfile {
     }
 
     @Getter
-    public class UserInfo {
+    public static class UserInfo {
         @JsonProperty("crossSaveOverride")
         private float crossSaveOverride;
 
@@ -86,5 +97,116 @@ public class WrapperGetProfile {
 
         @JsonProperty("bungieGlobalDisplayNameCode")
         private float bungieGlobalDisplayNameCode;
+    }
+
+    @Getter
+    public static class CharacterInventories {
+        @JsonProperty("data")
+        private CharacterData data;
+
+        @JsonProperty("privacy")
+        private int privacy;
+    }
+
+    @Getter
+    public static class CharacterData {
+        private Map<String, CharacterInventory> characters = new HashMap<>();
+
+        @JsonAnySetter
+        public void setCharacter(String key, CharacterInventory value) {
+            this.characters.put(key, value);
+        }
+
+    }
+
+    @Getter
+    public static class CharacterInventory {
+        @JsonProperty("items")
+        private ArrayList<Item> items;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Getter
+    public static class Item {
+
+        public WrapperManifestItem getItemDefinition() throws IOException {
+            // request item definition from the manifest
+            GenericDestinyRequest request = DestinyEndpoint.Generic.DESTINY2_SEARCH_MANIFEST
+                    .hitWithPath("GET",
+                            Map.of(
+                                    "entityType", "DestinyInventoryItemDefinition",
+                                    "hashIdentifier", itemHash)
+                    );
+            return request.getDestinyResponse(WrapperManifestItem.class).getResponse();
+        }
+
+        @JsonProperty("itemHash")
+        private String itemHash;
+
+        @JsonProperty("itemInstanceId")
+        private String itemInstanceId;
+
+        @JsonProperty("quantity")
+        private int quantity;
+
+        @JsonProperty("bindStatus")
+        private int bindStatus;
+
+        @JsonProperty("location")
+        private int location;
+
+        @JsonProperty("bucketHash")
+        private Object bucketHash;
+
+        @JsonProperty("transferStatus")
+        private int transferStatus;
+
+        @JsonProperty("lockable")
+        private boolean lockable;
+
+        @JsonProperty("state")
+        private int state;
+
+        @JsonProperty("dismantlePermission")
+        private int dismantlePermission;
+
+        @JsonProperty("isWrapper")
+        private boolean isWrapper;
+
+        @JsonProperty("tooltipNotificationIndexes")
+        private ArrayList<Integer> tooltipNotificationIndexes;
+
+        @JsonProperty("versionNumber")
+        private int versionNumber;
+
+        @JsonProperty("metricHash")
+        private long metricHash;
+
+        @JsonProperty("metricObjective")
+        private MetricObjective metricObjective;
+
+        @JsonProperty("itemValueVisibility")
+        private ArrayList<Boolean> itemValueVisibility;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Getter
+    public static class MetricObjective {
+        @JsonProperty("objectiveHash")
+        private int objectiveHash;
+
+        @JsonProperty("progress")
+        private int progress;
+
+        @JsonProperty("completionValue")
+        private int completionValue;
+
+        @JsonProperty("complete")
+        private boolean complete;
+
+        @JsonProperty("visible")
+        private boolean visible;
     }
 }
