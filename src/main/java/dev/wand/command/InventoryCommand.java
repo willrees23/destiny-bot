@@ -1,40 +1,16 @@
 package dev.wand.command;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.ygimenez.method.Pages;
-import com.github.ygimenez.model.InteractPage;
-import com.github.ygimenez.model.Page;
-import dev.wand.Main;
 import dev.wand.auth.AuthData;
 import dev.wand.endpoint.DestinyEndpoint;
 import dev.wand.request.AuthedDestinyRequest;
-import dev.wand.request.GenericDestinyRequest;
 import dev.wand.response.wrapper.WrapperGetCurrentBungieNetUser;
 import dev.wand.response.wrapper.WrapperGetLinkedProfiles;
 import dev.wand.response.wrapper.WrapperGetProfile;
-import dev.wand.response.wrapper.WrapperManifestItem;
-import dev.wand.util.ChatUtil;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.AutoCompleteQuery;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClients;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -89,9 +65,9 @@ public class InventoryCommand extends AuthedSlashCommand {
             String charId = (String) wrapperProfile.getProfile().getData().getCharacterIds().get(0);
 
             List<WrapperGetProfile.Item> items = wrapperProfile.getCharacterInventories().getData().getCharacters().get(charId).getItems();
-            List<Page> pages = new ArrayList<>();
 
             OptionMapping vaultOption = event.getOption("vault");
+            // boolean vault should only be true if the user has specified it in the command
             boolean vault = vaultOption != null && vaultOption.getAsBoolean();
 
             if (vault) {
@@ -101,19 +77,13 @@ public class InventoryCommand extends AuthedSlashCommand {
                 items = items.stream().filter(item -> item.getLocation() == 1).toList();
             }
 
-            // only 25 items can be shown in one embed, so we need to split the items into pages
-            for (int i = 0; i < items.size(); i += 24) {
-                List<WrapperGetProfile.Item> subList = items.subList(i, Math.min(i + 24, items.size()));
-                pages.add(
-                        InteractPage.of(
-                                ChatUtil.getInventoryEmbed(subList, vault)
-                        )
-                );
+            // each item is a page
+            for (WrapperGetProfile.Item item : items) {
+                // get index of item in list
+                int index = items.indexOf(item);
             }
 
-            event.getHook().sendMessageEmbeds((MessageEmbed) pages.get(0).getContent()).queue(success -> {
-                Pages.paginate(success, pages, true);
-            });
+
         } catch (Exception e) {
 
             event.getHook().sendMessage("An error occurred. Please try again later.").setEphemeral(true).queue();

@@ -1,7 +1,5 @@
 package dev.wand;
 
-import com.github.ygimenez.method.Pages;
-import com.github.ygimenez.model.PaginatorBuilder;
 import dev.wand.auth.AuthHandler;
 import dev.wand.command.*;
 import dev.wand.listener.ReadyListener;
@@ -57,8 +55,6 @@ public class Main {
         } catch (DIH4JDAException e) {
             e.printStackTrace();
         }
-
-        Pages.activate(PaginatorBuilder.createSimplePaginator(jda));
 
         // optionally block until JDA is ready
         jda.awaitReady();
